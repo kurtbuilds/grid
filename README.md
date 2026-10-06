@@ -8,8 +8,9 @@ the focused window into place, instantly with no animation.
 
 - **⌥Space** (configurable) opens the grid over the focused window's display.
 - **Drag** across cells to choose an area; release to apply. A single click picks one cell.
-- **Press a shortcut key** (e.g. `F` full screen, `C` center, arrows for halves,
-  `Q W A S` for quarters) to snap without the mouse. Plain keys need no modifier.
+- **Press a shortcut key** to snap without the mouse. Plain keys need no modifier. Defaults:
+  `Space` full screen, `G` center, `E` / `D` / `C` top-left / left half / bottom-left,
+  `I` / `K` / `,` top-right / right half / bottom-right.
 - **Tab / ⇧Tab** moves the window to the next / previous display.
 - **Press the launch shortcut again** to cycle displays too (or close the grid; see Settings).
 - **Esc** or clicking elsewhere closes it.
@@ -64,14 +65,14 @@ just release 1.0     # on the build Mac: build, sign, push, publish the GitHub r
 just update          # on any Mac with a checkout: install the latest release
 ```
 
-On a Mac without a checkout (needs `gh auth login`, since the repo is private):
+On a Mac without a checkout:
 
 ```sh
-gh api repos/kurtbuilds/grid/contents/scripts/install-latest.sh -H "Accept: application/vnd.github.raw" | bash
+curl -fsSL https://raw.githubusercontent.com/kurtbuilds/grid/master/scripts/install-latest.sh | bash
 ```
 
 Builds are signed but not notarized, which is fine for your own Macs: files downloaded with
-`gh` aren't quarantined, so Gatekeeper doesn't get involved. A copy downloaded in a browser would
+`curl` aren't quarantined, so Gatekeeper doesn't get involved. A copy downloaded in a browser would
 be blocked; clear the flag with `xattr -dr com.apple.quarantine /Applications/Grid.app`.
 Accessibility access is granted once per Mac and then survives updates.
 

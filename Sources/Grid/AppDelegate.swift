@@ -176,8 +176,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
                 write(rep, "settings.png")
             }
             write(self.overlay.debugSnapshot(), "overlay.png")
+            self.snapshotEditor(write: write)
             self.settingsWindow?.close()
             self.snapshotOnboarding(OnboardingStep.allCases, to: dir, write: write)
+        }
+    }
+
+    private func snapshotEditor(write: @escaping (NSBitmapImageRep?, String) -> Void) {
+        let editor = ShortcutEditor(draft: store.config.shortcuts[1], isNew: false, existing: store.config.shortcuts) { _ in }
+        let window = NSWindow(contentViewController: NSHostingController(rootView: editor))
+        window.orderFront(nil)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            if let view = window.contentView?.superview, let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) {
+                view.cacheDisplay(in: view.bounds, to: rep)
+                write(rep, "editor.png")
+            }
+            window.close()
         }
     }
 

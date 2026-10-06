@@ -127,7 +127,7 @@ struct OnboardingView: View {
                 .font(.title3).foregroundStyle(.secondary).multilineTextAlignment(.center)
             VStack(alignment: .leading, spacing: 12) {
                 Feature(symbol: "keyboard", text: "Press \(store.config.launchKey.displayString) anywhere to open the grid")
-                Feature(symbol: "hand.draw", text: "Drag across cells, or press a saved key like C or F")
+                Feature(symbol: "hand.draw", text: "Drag across cells, or press a saved key like G or Space")
                 Feature(symbol: "display.2", text: "Press Tab to send the window to your next display")
             }
             .padding(.top, 6)
@@ -219,7 +219,7 @@ struct OnboardingView: View {
                 }
                 Checklist(done: model.snappedWindow) {
                     HStack(spacing: 6) {
-                        Text("Drag across a few cells, or press"); KeyCap(text: "C"); Text("to center it")
+                        Text("Drag across a few cells, or press"); KeyCap(text: "G"); Text("to center it")
                     }
                 }
             }
@@ -247,7 +247,7 @@ struct OnboardingView: View {
                 KeyHelp(key: "Tab", text: "Move the window to the next display (⇧Tab goes back)")
                 KeyHelp(key: store.config.launchKey.displayString, text: store.config.repeatBehavior == .cycleDisplays
                         ? "Press again to cycle displays" : "Press again to close")
-                KeyHelp(key: "F  C  ←  →", text: "Saved shortcuts: full screen, center, halves…")
+                KeyHelp(key: "E  D  C  ·  I  K  ,", text: "Saved shortcuts: left and right quarters and halves")
                 KeyHelp(key: "Esc", text: "Close the grid")
             }
             .padding(.top, 4)

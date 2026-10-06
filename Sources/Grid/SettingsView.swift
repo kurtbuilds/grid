@@ -9,6 +9,7 @@ struct SettingsView: View {
     @State private var axTrusted = WindowManager.isTrusted
     @State private var launchAtLogin = LaunchAtLogin.isEnabled
     @State private var hotKeyFailed = false
+    @State private var confirmRestore = false
 
     private let trustTimer = Timer.publish(every: 1.5, on: .main, in: .common).autoconnect()
 
@@ -79,6 +80,18 @@ struct SettingsView: View {
                     ), isNew: true)
                 } label: {
                     Label("Add Shortcut", systemImage: "plus")
+                }
+                .buttonStyle(.borderless)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .overlay(alignment: .trailing) {
+                    Button("Restore Defaults…") { confirmRestore = true }
+                        .buttonStyle(.borderless)
+                        .disabled(store.config.shortcuts == Config.defaultShortcuts)
+                }
+                .confirmationDialog("Replace your shortcuts with the defaults?", isPresented: $confirmRestore) {
+                    Button("Restore Defaults", role: .destructive) { store.config.shortcuts = Config.defaultShortcuts }
+                } message: {
+                    Text("Your current shortcuts will be removed.")
                 }
             } header: {
                 Text("Keyboard Shortcuts")
@@ -219,8 +232,10 @@ struct ShortcutEditor: View {
                 GridRow {
                     Text("Key")
                     HStack {
+                        // Starts listening right away: open the editor and just type the new key.
                         ShortcutRecorder(combo: $draft.key, allowsClear: true,
-                                         reservedKeys: [UInt16(kVK_Escape), UInt16(kVK_Tab)])
+                                         reservedKeys: [UInt16(kVK_Escape), UInt16(kVK_Tab)],
+                                         recordOnAppear: true)
                         if let conflict {
                             Text("Also used by “\(conflict.name)”").font(.caption).foregroundStyle(.orange)
                         }
@@ -236,7 +251,7 @@ struct ShortcutEditor: View {
             }
 
             GridSelector(columns: draft.columns, rows: draft.rows, selection: $draft.rect)
-                .aspectRatio(16 / 10, contentMode: .fit)
+                .frame(height: 250) // explicit: a GeometryReader in a self-sizing sheet can collapse
             Text("Drag across the grid to choose the area.").font(.callout).foregroundStyle(.secondary)
 
             HStack {
@@ -300,14 +315,17 @@ struct ShortcutRecorder: View {
     @Binding var combo: KeyCombo?
     var allowsClear: Bool
     var reservedKeys: Set<UInt16> = []
+    /// Start recording as soon as the control appears. Esc then cancels the surrounding sheet too.
+    var recordOnAppear = false
     @StateObject private var model = RecorderModel()
 
     var body: some View {
         HStack(spacing: 6) {
             Button {
-                model.isRecording ? model.stop() : model.start(reserved: reservedKeys) { combo = $0 }
+                model.isRecording ? model.stop() : startRecording(passEscape: false)
             } label: {
-                Text(model.isRecording ? "Type a key…" : (combo?.displayString ?? "Click to record"))
+                Text(model.isRecording ? (combo.map { "\($0.displayString) → type a key…" } ?? "Type a key…")
+                                       : (combo?.displayString ?? "Click to record"))
                     .frame(minWidth: 110)
             }
             .tint(model.isRecording ? .accentColor : nil)
@@ -321,7 +339,12 @@ struct ShortcutRecorder: View {
                 Text(message).font(.caption).foregroundStyle(.orange)
             }
         }
+        .onAppear { if recordOnAppear { startRecording(passEscape: true) } }
         .onDisappear { model.stop() }
+    }
+
+    private func startRecording(passEscape: Bool) {
+        model.start(reserved: reservedKeys, passEscape: passEscape) { combo = $0 }
     }
 }
 
@@ -331,7 +354,7 @@ final class RecorderModel: ObservableObject {
     private var monitor: Any?
     private static weak var active: RecorderModel?
 
-    func start(reserved: Set<UInt16>, onRecord: @escaping (KeyCombo) -> Void) {
+    func start(reserved: Set<UInt16>, passEscape: Bool = false, onRecord: @escaping (KeyCombo) -> Void) {
         Self.active?.stop()
         Self.active = self
         message = nil
@@ -342,6 +365,7 @@ final class RecorderModel: ObservableObject {
             let combo = KeyCombo(event: event)
             if event.keyCode == UInt16(kVK_Escape) && combo.modifierFlags.isEmpty {
                 self.stop()
+                return passEscape ? event : nil
             } else if reserved.contains(event.keyCode) {
                 self.message = "\(combo.displayString) is reserved"
             } else {

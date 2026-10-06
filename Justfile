@@ -12,9 +12,9 @@ use_xcode  := path_exists(xcode_dev)
 # Codesigning identity: your Developer ID / Apple Development cert. Override with GRID_SIGN_IDENTITY="…".
 # A stable identity is what lets macOS keep Grid's Accessibility access across rebuilds.
 # Pin to one team's certificate when your Apple ID belongs to several (the Personal Team's ID).
-export GRID_TEAM_ID := env("GRID_TEAM_ID", "")
+export GRID_TEAM_ID := env("GRID_TEAM_ID", "AB3SV994YR") # Kurt Spindler (Personal Team)
 sign_identity := `scripts/signing-identity.sh`
-sign_name     := if sign_identity == "" { "" } else { `security find-identity -v -p codesigning | grep -o "$(scripts/signing-identity.sh) "[^"]*"" | cut -d'"' -f2 || true` }
+sign_name     := `scripts/signing-identity.sh --name`
 # Swift Testing lives outside the default search paths when only the Command Line Tools are installed.
 dev_dir    := `xcode-select -p`
 test_flags := if dev_dir =~ "CommandLineTools" { "-Xswiftc -F" + dev_dir + "/Library/Developer/Frameworks -Xlinker -F" + dev_dir + "/Library/Developer/Frameworks -Xlinker -rpath -Xlinker " + dev_dir + "/Library/Developer/Frameworks -Xlinker -rpath -Xlinker " + dev_dir + "/Library/Developer/usr/lib" } else { "" }
@@ -81,7 +81,7 @@ release version: (build version)
     git fetch --tags --quiet
     echo "Released v{{version}}. On other Macs: just update  (or see README → Install on other Macs)"
 
-# Install the latest GitHub release into /Applications (any Mac signed in to `gh`)
+# Install the latest GitHub release into /Applications
 update:
     scripts/install-latest.sh {{repo}}
 

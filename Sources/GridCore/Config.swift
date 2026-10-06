@@ -92,26 +92,23 @@ public struct Config: Codable, Equatable, Sendable {
         shortcuts.first { $0.key == combo }
     }
 
+    /// Left hand (E D C) covers the left column, right hand (I K ,) the right; Space and G for full/center.
     public static let defaultShortcuts: [GridShortcut] = [
-        GridShortcut(name: "Full Screen", key: KeyCombo(keyCode: UInt16(kVK_ANSI_F)), columns: 4, rows: 4,
+        GridShortcut(name: "Full Screen", key: KeyCombo(keyCode: UInt16(kVK_Space)), columns: 4, rows: 4,
                      rect: GridRect(x: 0, y: 0, w: 4, h: 4)),
-        GridShortcut(name: "Center", key: KeyCombo(keyCode: UInt16(kVK_ANSI_C)), columns: 4, rows: 4,
+        GridShortcut(name: "Center", key: KeyCombo(keyCode: UInt16(kVK_ANSI_G)), columns: 4, rows: 4,
                      rect: GridRect(x: 1, y: 1, w: 2, h: 2)),
-        GridShortcut(name: "Left Half", key: KeyCombo(keyCode: UInt16(kVK_LeftArrow)), columns: 4, rows: 4,
-                     rect: GridRect(x: 0, y: 0, w: 2, h: 4)),
-        GridShortcut(name: "Right Half", key: KeyCombo(keyCode: UInt16(kVK_RightArrow)), columns: 4, rows: 4,
-                     rect: GridRect(x: 2, y: 0, w: 2, h: 4)),
-        GridShortcut(name: "Top Half", key: KeyCombo(keyCode: UInt16(kVK_UpArrow)), columns: 4, rows: 4,
-                     rect: GridRect(x: 0, y: 0, w: 4, h: 2)),
-        GridShortcut(name: "Bottom Half", key: KeyCombo(keyCode: UInt16(kVK_DownArrow)), columns: 4, rows: 4,
-                     rect: GridRect(x: 0, y: 2, w: 4, h: 2)),
-        GridShortcut(name: "Upper Left", key: KeyCombo(keyCode: UInt16(kVK_ANSI_Q)), columns: 4, rows: 4,
+        GridShortcut(name: "Top Left", key: KeyCombo(keyCode: UInt16(kVK_ANSI_E)), columns: 4, rows: 4,
                      rect: GridRect(x: 0, y: 0, w: 2, h: 2)),
-        GridShortcut(name: "Upper Right", key: KeyCombo(keyCode: UInt16(kVK_ANSI_W)), columns: 4, rows: 4,
-                     rect: GridRect(x: 2, y: 0, w: 2, h: 2)),
-        GridShortcut(name: "Lower Left", key: KeyCombo(keyCode: UInt16(kVK_ANSI_A)), columns: 4, rows: 4,
+        GridShortcut(name: "Left Half", key: KeyCombo(keyCode: UInt16(kVK_ANSI_D)), columns: 4, rows: 4,
+                     rect: GridRect(x: 0, y: 0, w: 2, h: 4)),
+        GridShortcut(name: "Bottom Left", key: KeyCombo(keyCode: UInt16(kVK_ANSI_C)), columns: 4, rows: 4,
                      rect: GridRect(x: 0, y: 2, w: 2, h: 2)),
-        GridShortcut(name: "Lower Right", key: KeyCombo(keyCode: UInt16(kVK_ANSI_S)), columns: 4, rows: 4,
+        GridShortcut(name: "Top Right", key: KeyCombo(keyCode: UInt16(kVK_ANSI_I)), columns: 4, rows: 4,
+                     rect: GridRect(x: 2, y: 0, w: 2, h: 2)),
+        GridShortcut(name: "Right Half", key: KeyCombo(keyCode: UInt16(kVK_ANSI_K)), columns: 4, rows: 4,
+                     rect: GridRect(x: 2, y: 0, w: 2, h: 4)),
+        GridShortcut(name: "Bottom Right", key: KeyCombo(keyCode: UInt16(kVK_ANSI_Comma)), columns: 4, rows: 4,
                      rect: GridRect(x: 2, y: 2, w: 2, h: 2)),
     ]
 }
