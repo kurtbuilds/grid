@@ -4,6 +4,22 @@ A small native macOS window manager in the spirit of Divvy. It lives in the menu
 and a global shortcut brings up a grid you can drag across (or hit a single key) to snap
 the focused window into place, instantly with no animation.
 
+## Install
+
+On an Apple silicon Mac running macOS 14 or later:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/kurtbuilds/grid/master/scripts/install-latest.sh | bash
+```
+
+This installs the latest release into /Applications and launches it. Run it again any time to
+update. On first launch, a setup guide walks you through granting Accessibility access.
+
+Builds are signed but not notarized. Files downloaded with `curl` aren't quarantined, so
+Gatekeeper doesn't get involved. If you download `Grid.zip` from the
+[releases page](https://github.com/kurtbuilds/grid/releases) in a browser instead, clear the
+quarantine flag after unzipping: `xattr -dr com.apple.quarantine /Applications/Grid.app`.
+
 ## Use
 
 - **⌥Space** (configurable) opens the grid over the focused window's display.
@@ -21,7 +37,8 @@ remembers the grid it was drawn on, so changing the grid size never breaks it.
 
 ## Build
 
-Needs only the Xcode Command Line Tools (Swift 6) and [`just`](https://github.com/casey/just), with no Xcode project.
+Needs Xcode (for the latest macOS SDK and your signing certificate, see [Signing](#signing))
+and [`just`](https://github.com/casey/just). There's no Xcode project; everything builds with SwiftPM.
 
 ```sh
 just              # list recipes
@@ -56,25 +73,17 @@ To get a certificate: Xcode → Settings → Accounts → select the team → **
 
 Builds are Apple silicon only and run on macOS 14 and later.
 
-## Install on other Macs
+## Releasing
 
-Releases are published to GitHub, and every Mac installs the same signed build:
+Every Mac installs the same signed build from GitHub Releases:
 
 ```sh
-just release 1.0     # on the build Mac: build, sign, push, publish the GitHub release
+just release 1.2     # on the build Mac: build, sign, push, publish the GitHub release
 just update          # on any Mac with a checkout: install the latest release
 ```
 
-On a Mac without a checkout:
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/kurtbuilds/grid/master/scripts/install-latest.sh | bash
-```
-
-Builds are signed but not notarized, which is fine for your own Macs: files downloaded with
-`curl` aren't quarantined, so Gatekeeper doesn't get involved. A copy downloaded in a browser would
-be blocked; clear the flag with `xattr -dr com.apple.quarantine /Applications/Grid.app`.
-Accessibility access is granted once per Mac and then survives updates.
+`just release` needs a clean, committed tree. Accessibility access is granted once per Mac and
+then survives updates, because every release is signed with the same certificate.
 
 ## Layout
 
