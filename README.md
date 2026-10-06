@@ -45,19 +45,35 @@ The first launch opens a short setup guide (reopen it any time from the menu bar
 ## Signing
 
 Builds are signed with your Apple developer certificate: the first **Developer ID Application**
-identity in your keychain, else the first **Apple Development** one (`just signing` shows which;
-override with `GRID_SIGN_IDENTITY="…"`). A stable signature is what lets macOS keep Grid's
-Accessibility access across rebuilds. `just build` stops with an error if no certificate is found.
+identity in your keychain, else the first **Apple Development** one. If your Apple ID belongs to
+several teams, `GRID_TEAM_ID` (set at the top of the Justfile) restricts it to one team's
+certificates. `just signing` shows which certificate will be used. A stable signature is what lets
+macOS keep Grid's Accessibility access across updates.
 
-To install a certificate without Xcode:
+To get a certificate: Xcode → Settings → Accounts → select the team → **Manage Certificates…**
+→ **+** → **Apple Development**.
 
-1. Keychain Access → Certificate Assistant → *Request a Certificate From a Certificate Authority*
-   → enter your email → *Saved to disk*.
-2. developer.apple.com → Certificates → **+** → *Apple Development* (or *Developer ID Application*)
-   → upload the request → download the `.cer` and double-click it.
-3. If `just signing` still finds nothing, install Apple's intermediate certificate from
-   apple.com/certificateauthority ("Worldwide Developer Relations – G3" for Apple Development,
-   "Developer ID – G2" for Developer ID).
+With Xcode installed, builds are universal (Apple silicon + Intel) and run on macOS 14 and later.
+
+## Install on other Macs
+
+Releases are published to GitHub, and every Mac installs the same signed build:
+
+```sh
+just release 1.0     # on the build Mac: build, sign, push, publish the GitHub release
+just update          # on any Mac with a checkout: install the latest release
+```
+
+On a Mac without a checkout (needs `gh auth login`, since the repo is private):
+
+```sh
+gh api repos/kurtbuilds/grid/contents/scripts/install-latest.sh -H "Accept: application/vnd.github.raw" | bash
+```
+
+Builds are signed but not notarized, which is fine for your own Macs: files downloaded with
+`gh` aren't quarantined, so Gatekeeper doesn't get involved. A copy downloaded in a browser would
+be blocked; clear the flag with `xattr -dr com.apple.quarantine /Applications/Grid.app`.
+Accessibility access is granted once per Mac and then survives updates.
 
 ## Layout
 
