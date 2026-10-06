@@ -54,7 +54,7 @@ macOS keep Grid's Accessibility access across updates.
 To get a certificate: Xcode → Settings → Accounts → select the team → **Manage Certificates…**
 → **+** → **Apple Development**.
 
-With Xcode installed, builds are universal (Apple silicon + Intel) and run on macOS 14 and later.
+Builds are Apple silicon only and run on macOS 14 and later.
 
 ## Install on other Macs
 

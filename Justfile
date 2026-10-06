@@ -6,7 +6,7 @@ app        := "build/Grid.app"
 installed  := "/Applications/Grid.app"
 repo       := "kurtbuilds/grid"
 min_macos  := "14.0"
-# Build with Xcode's toolchain when it's installed (needed for universal binaries); else the CLT.
+# Build with Xcode's toolchain (newest macOS SDK) when it's installed; else the Command Line Tools.
 xcode_dev  := "/Applications/Xcode.app/Contents/Developer"
 use_xcode  := path_exists(xcode_dev)
 # Codesigning identity: your Developer ID / Apple Development cert. Override with GRID_SIGN_IDENTITY="…".
@@ -23,7 +23,7 @@ test_flags := if dev_dir =~ "CommandLineTools" { "-Xswiftc -F" + dev_dir + "/Lib
 default:
     @just --list --unsorted
 
-# Build the signed release app bundle into build/Grid.app (universal when Xcode is installed)
+# Build the signed release app bundle into build/Grid.app (Apple silicon only)
 build version="":
     #!/usr/bin/env bash
     set -euo pipefail
@@ -33,11 +33,11 @@ build version="":
       exit 1
     fi
     {{ if use_xcode == "true" { "export DEVELOPER_DIR=" + xcode_dev } else { "" } }}
-    archs=({{ if use_xcode == "true" { "--arch arm64 --arch x86_64" } else { "" } }})
+    # Apple silicon only: macOS 27 dropped Intel, and every Mac this runs on is arm64.
     # SwiftPM records the deployment target as the SDK version too, which makes macOS run the app
     # in compatibility mode (no current system look). Record the real SDK instead.
     sdk="$(xcrun --sdk macosx --show-sdk-version)"
-    flags=(-c release "${archs[@]}" -Xlinker -platform_version -Xlinker macos -Xlinker {{min_macos}} -Xlinker "$sdk")
+    flags=(-c release --arch arm64 -Xlinker -platform_version -Xlinker macos -Xlinker {{min_macos}} -Xlinker "$sdk")
     swift build "${flags[@]}"
     bin="$(swift build "${flags[@]}" --show-bin-path)/{{app_name}}"
 
