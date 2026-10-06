@@ -6,7 +6,7 @@ REPO="${1:-kurtbuilds/grid}"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
-echo "→ Downloading the latest Grid release from $REPO…"
+echo "→ Downloading the latest Grid release from ${REPO}…"
 curl -fsSL -o "$WORK/Grid.zip" "https://github.com/$REPO/releases/latest/download/Grid.zip"
 ditto -x -k "$WORK/Grid.zip" "$WORK"
 codesign --verify --strict "$WORK/Grid.app"
